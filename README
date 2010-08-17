@@ -4,5 +4,5 @@ Copyright 2010 Vimeo, LLC.
 
 Updates old object embed code to use the new iframe Universal Embed method
 
-USAGE: Include the javascript file at the end of the body and it'll automaticall search
+USAGE: Include the javascript file at the end of the body and it'll automatically search
 for vimeo embed code and update any matches to use the iframe.
