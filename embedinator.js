@@ -1,37 +1,56 @@
 (function(){
+    if(!/(ipad|iphone|ipod|android|webos)/.test(navigator.userAgent.toLowerCase())) {
+        return false;
+    }
+
     var objects = document.getElementsByTagName('object'),
-    object, params, param, name, value, clip_id, paramsArr, finds;
+    object, params, param, name, value;
 
     for( var i=0; i<objects.length; i++ ) {
         object = objects[i],
         params = object.getElementsByTagName('param');
-        finds = 0;
 
-        for( var ii=0; ii<params.length && finds == 0; ii++) {
-            param = params[ii];
-            name = param.getAttribute('name');
+        value = object.getAttribute('data');
 
-            if( name == 'src' || name == 'movie' ) {
-                value = param.getAttribute('value');
+        //Checks for url in the object data attribute
+        if(/moogaloop/.test(value)) {
+            getParams(object, value);
+        }
+        //Checks for url in the object's params
+        else {
+            for( var j=0; j<params.length; j++) {
+                param = params[j];
+                name = param.getAttribute('name');
 
-                if(/moogaloop/.test(value)) {
-                    finds++;
+                if( name == 'src' || name == 'movie' ) {
+                    value = param.getAttribute('value');
 
-                    paramsArr = value.split('?')[1].split('clip_id=')[1].split('&');
-                    clip_id = paramsArr[0];
-                    qparams = paramsArr[1];
-
-                    replace(object, clip_id, qparams, object.getAttribute('width'), object.getAttribute('height'));
+                    if(/moogaloop/.test(value)) {
+                        (function(o, v) {
+                            setTimeout(function(){
+                                getParams(o, v);
+                            }, 10);
+                        })(object, value);
+                        break;
+                    }
                 }
             }
         }
     }
 
-    function replace(target, clip_id, params, width, height) {
+    function getParams(target, val) {
+        var paramsArr = val.split('?')[1].split('clip_id=')[1].split('&'),
+        clip_id = paramsArr[0],
+        qparams = paramsArr[1];
+
+        replace(target, clip_id, qparams, object.getAttribute('width'), object.getAttribute('height'));
+    }
+
+    function replace(target, clip_id, qparams, width, height) {
         var iframe = document.createElement('iframe');
         iframe.setAttribute('width', width);
         iframe.setAttribute('height', height);
-        iframe.setAttribute('src', 'http://player.vimeo.com/video/'+clip_id+'?'+params);
+        iframe.setAttribute('src', 'http://player.vimeo.com/video/'+clip_id+'?'+qparams);
         iframe.setAttribute('frameborder', 0);
 
         //insert iframe
